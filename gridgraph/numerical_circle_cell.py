@@ -31,6 +31,17 @@ def sweep_func_over(func, low, high, filename=None):
 
 
 def simulate_H(params, force=None):
+    """Numerical simulation of the power output of a circular solar cell with
+    H-bar grid design and optimal line thickness and pitch under the
+    provided params.
+
+    params - dictionary of material and simulation parameters
+    force - optional tuple containing (width, pitch). If provided, no
+    optimization is performed, instead the power output is estimated at the
+    provided grid geometry.
+
+    returns - Power [W], width[cm], pitch[cm]"""
+
     # Set some local vars for brevity, we need it where we're going...
     R = params['R']
     Jsol = params['Jsol']
@@ -103,7 +114,17 @@ def simulate_H(params, force=None):
     return Power, w, b
 
 
-def simulate_iso(params):
+def simulate_iso(params, force=None):
+    """Numerical simulation of the power output of a circular solar cell with
+    isotropic grid design and optimal line thickness and pitch under the
+    provided params.
+
+    params - dictionary of material and simulation parameters
+    force - optional tuple containing (width, pitch). If provided, no
+    optimization is performed, instead the power output is estimated at the
+    provided grid geometry.
+
+    returns - Power [W], width[cm], pitch[cm]"""
     # Set some local vars for brevity, we need it where we're going...
     R = params['R']
     Jsol = params['Jsol']
@@ -149,6 +170,10 @@ def simulate_iso(params):
 
         # [W] Power lost from all sources in the grid lines
         return P_sheet + P_shadow + P_grid + Reg
+
+    if force is not None:          # No solve, just run at the force geometry
+        Power = P_max - P_grid(force[0], force[1])
+        return Power, force[0], force[1]  # Power, w, b
 
     # Find the optimal grid to minimize power loss
     optim = minimize(lambda x: P_grid(x[0], x[1]),
