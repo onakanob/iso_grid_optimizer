@@ -15,12 +15,11 @@ To run the numerical experiments used to generate these figures, run the script 
 Material parameters can be adjusted by changing the target csv recipe file.
 
 ## Just the models
-To query model directly in Python, invoke the functions defined in ./gridgraph/numerical_circle_cell.py
+To query model directly in Python, invoke the functions defined in ./gridgraph/numerical_circle_cell.py. For H-bar and isotropic grids respectively, the functions perform numerical simulation of the power output of a circular solar cell with optimal line thickness and pitch under the provided params.
 
 simulate_H(params, force=None)
-simulate_iso(params, force=None)
 
-For H-bar and isotropic grids respectively, the functions perform numerical simulation of the power output of a circular solar cell with optimal line thickness and pitch under the provided params.
+simulate_iso(params, force=None)
 
     params - dictionary of material and simulation parameters
     force - optional tuple containing (width, pitch). If provided, no
