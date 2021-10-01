@@ -50,6 +50,7 @@ def simulate_H(params, force=None):
     w_min = params['w_min']
     b_min = params['b_min']
     p_metal = params['Pwire'] / params['h']  # ~0.1 Ohm/sq
+    # E = params['epsilon']                    # cm
 
     ''' Half-circle functions '''
     # Length bus-to-edge as you travel out from the center sink
@@ -71,7 +72,7 @@ def simulate_H(params, force=None):
         an H-Bar circular cell assuming optimal pitch.'''
         nonlocal P_bus, P_max, R, Rsheet, l, p_metal
 
-        E = 1e-12               # Safety factor to avoid div-by-zero
+        # E = 1e-12               # Safety factor to avoid div-by-zero
         wbus = w                # bus and line widths equal
 
         # Busbar values:
@@ -81,7 +82,8 @@ def simulate_H(params, force=None):
         P_bus_shadow = 2 * R * Jsol * Voc * wbus
 
         # [W] Power lost due to grid shadowing
-        P_shadow = P_max * w / (b + E)
+        # P_shadow = P_max * w / (b + E)
+        P_shadow = P_max * w / b
         # [W] lost in the sheet (before finding a gridline) over the whole cell
         P_sheet = (np.pi / 12) * Jsol**2 * Rsheet * R**2 * b**2
 
@@ -133,6 +135,7 @@ def simulate_iso(params, force=None):
     w_min = params['w_min']
     b_min = params['b_min']
     p_metal = params['Pwire'] / params['h']  # ~0.1 Ohm/sq
+    E = params['epsilon']                    # cm
 
     # Helper equations
     C_at = lambda r: 2 * np.pi * r  # [cm] circumference
@@ -150,20 +153,23 @@ def simulate_iso(params, force=None):
         the isotropic grid."""
         nonlocal P_max, R, Rsheet, p_metal
 
-        E = 1e-12               # Safety factor to avoid div-by-zero
+        # E = 1e-12               # Safety factor to avoid div-by-zero
 
         # [W] Power lost in sheet is not a function of w:
         # P_sheet = Jsol**2 * (np.pi / 32) * p_metal * R**2 * b**2
         P_sheet = Jsol**2 * (np.pi / 32) * Rsheet * R**2 * b**2
         # [W] Power lost due to shadowing
-        P_shadow = 2 * P_max * w / (b + E)
+        # P_shadow = 2 * P_max * w / (b + E)
+        P_shadow = 2 * P_max * w / b
 
         """ [W] Power lost in the grid lines """
         # [Ohms/sq.] Effective sheet resistance of the grid
-        R_grid = p_metal * b / (w + E)
+        # R_grid = p_metal * b / (w + E)
+        R_grid = p_metal * b / w
         # [W/cm] Power lost in a constant-radius slice of the circle
-        P_grid_at = lambda r: I_cumulative(r)**2 * R_grid / C_at(r + E)
-        P_grid = quad(P_grid_at, 0, R)[0]  # [W]
+        # P_grid_at = lambda r: I_cumulative(r)**2 * R_grid / C_at(r + E)
+        P_grid_at = lambda r: I_cumulative(r)**2 * R_grid / C_at(r)
+        P_grid = quad(P_grid_at, E, R)[0]  # [W]  TODO 0 >> E
 
         # Regularizer: motivate large pitch
         Reg = -Regularize * b**2
