@@ -50,7 +50,7 @@ def simulate_H(params, force=None):
     w_min = params['w_min']
     b_min = params['b_min']
     p_metal = params['Pwire'] / params['h']  # ~0.1 Ohm/sq
-    # E = params['epsilon']                    # cm
+    E = params['epsilon']                    # cm
 
     ''' Half-circle functions '''
     # Length bus-to-edge as you travel out from the center sink
@@ -70,14 +70,14 @@ def simulate_H(params, force=None):
         '''Input: w width of a grid's metal line
         Return: Power lost from shadow, sheet, and line drop in the grid of
         an H-Bar circular cell assuming optimal pitch.'''
-        nonlocal P_bus, P_max, R, Rsheet, l, p_metal
+        nonlocal P_bus, P_max, R, Rsheet, l, p_metal, E
 
         # E = 1e-12               # Safety factor to avoid div-by-zero
         wbus = w                # bus and line widths equal
 
         # Busbar values:
         # [W] Total resistive loss in 2 bus bars:
-        P_bus_line = 2 * quad(lambda x: P_bus(x, wbus), 0, R)[0]
+        P_bus_line = 2 * quad(lambda x: P_bus(x, wbus), E, R)[0]
         # [W] Total lost in shadow for 2 bus bars:
         P_bus_shadow = 2 * R * Jsol * Voc * wbus
 
@@ -169,7 +169,7 @@ def simulate_iso(params, force=None):
         # [W/cm] Power lost in a constant-radius slice of the circle
         # P_grid_at = lambda r: I_cumulative(r)**2 * R_grid / C_at(r + E)
         P_grid_at = lambda r: I_cumulative(r)**2 * R_grid / C_at(r)
-        P_grid = quad(P_grid_at, E, R)[0]  # [W]  TODO 0 >> E
+        P_grid = quad(P_grid_at, E, R)[0]  # [W]
 
         # Regularizer: motivate large pitch
         Reg = -Regularize * b**2
