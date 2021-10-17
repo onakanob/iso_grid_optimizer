@@ -72,6 +72,7 @@ def simulate_H(params, force=None):
         an H-Bar circular cell assuming optimal pitch.'''
         nonlocal P_bus, P_max, R, Rsheet, l, p_metal, E
 
+        # TODO
         wbus = w                # bus and line widths equal
 
         # Busbar values:
@@ -103,7 +104,7 @@ def simulate_H(params, force=None):
         Power = P_max - P_grid(force[0], force[1])
         return Power, force[0], force[1]  # Power, w, b
         
-
+    # TODO
     # optim = minimize(lambda x: P_grid(x[0], x[1], x[2]),  # w, wbus, b
     #                  x0=[R * 0.01, R * 0.01, b_min],
     #                  bounds=((w_min, R * 0.5),
@@ -117,7 +118,8 @@ def simulate_H(params, force=None):
                  tol=1e-6)
     Power = P_max - optim.fun
     w, b = optim.x
-    # w, wbus, b = optim.x
+    # w, wbus, b = optim.x        # TODO
+    # print(f'wbus: {wbus:.4f}')                     # TODO
     return Power, w, b
     # return Power, w, wbus, b
 
