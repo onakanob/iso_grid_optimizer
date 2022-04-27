@@ -84,7 +84,7 @@ def compare_H_vs_Iso(params):
     logging.info('Center point: ' + str(df))
 
     # EXPERIMENT: Sweep Sheet Resistivity
-    Rs = np.logspace(np.log10(10), np.log10(100000), num=RESOLUTION,
+    Rs = np.logspace(np.log10(1), np.log10(10000), num=RESOLUTION,
                      endpoint=True, base=10)
     # Rs = np.array([46.42, 215.44, 1000, 4641.59, 21544.35])
     df = pd.DataFrame()
@@ -167,7 +167,11 @@ def wobble_about_optimal(params):
                                   'pitch': b},
                                  ignore_index=True)
 
-    power, best_w, best_b = simulate_H(params)
+    # TODO skip this force
+    # power, best_w, best_b = simulate_H(params)
+    best_w = 0.0213923763549842
+    best_b = 0.17134455868565
+    power, _, _ = simulate_H(params, force=(best_w, best_b))
     log_result(power, best_w, best_b)
     logging.info('Center optimal (power, width, pitch): ' + str((power, best_w, best_b)))
 
