@@ -12,7 +12,6 @@ from matplotlib import pyplot as plt
 from scipy.integrate import quad
 from scipy.optimize import minimize
 
-# Regularize = 1e-3       # Regularizing factor: maximize b
 Regularize = 1e-9               # Small factor
 
 
@@ -65,14 +64,12 @@ def simulate_H(params, force=None):
     P_max = Jsol * Voc * np.pi * R**2  # 100% FF [Watts]
 
     # Grid values:
-    # def P_grid(w, wbus, b):     # TODO try with wbus option
     def P_grid(w, b):
         '''Input: w width of a grid's metal line
         Return: Power lost from shadow, sheet, and line drop in the grid of
         an H-Bar circular cell assuming optimal pitch.'''
         nonlocal P_bus, P_max, R, Rsheet, l, p_metal, E
 
-        # TODO
         wbus = w                # bus and line widths equal
 
         # Busbar values:
@@ -104,13 +101,6 @@ def simulate_H(params, force=None):
         Power = P_max - P_grid(force[0], force[1])
         return Power, force[0], force[1]  # Power, w, b
         
-    # TODO
-    # optim = minimize(lambda x: P_grid(x[0], x[1], x[2]),  # w, wbus, b
-    #                  x0=[R * 0.01, R * 0.01, b_min],
-    #                  bounds=((w_min, R * 0.5),
-    #                          (w_min, R * 0.5),
-    #                          (b_min, R * 0.5)),
-    #                  tol=1e-6)
     optim = minimize(lambda x: P_grid(x[0], x[1]),  # w, b
                  x0=[R * 0.01, b_min],
                  bounds=((w_min, R * 0.5),
@@ -118,10 +108,7 @@ def simulate_H(params, force=None):
                  tol=1e-6)
     Power = P_max - optim.fun
     w, b = optim.x
-    # w, wbus, b = optim.x        # TODO
-    # print(f'wbus: {wbus:.4f}')                     # TODO
     return Power, w, b
-    # return Power, w, wbus, b
 
 
 def simulate_iso(params, force=None):

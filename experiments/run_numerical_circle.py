@@ -70,7 +70,6 @@ def vis_trend(df, xaxis, xlabel, title, directory, logscale=False):
     fig.savefig(os.path.join(directory, title + '.png'))
 
 
-# TODO switched back to logspace sweeps
 def compare_H_vs_Iso(params):
     RESOLUTION = 7
     output_csv = os.path.join(params['log_dir'], 'results.csv')
@@ -86,13 +85,14 @@ def compare_H_vs_Iso(params):
     # EXPERIMENT: Sweep Sheet Resistivity
     Rs = np.logspace(np.log10(1), np.log10(10000), num=RESOLUTION,
                      endpoint=True, base=10)
-    # Rs = np.array([46.42, 215.44, 1000, 4641.59, 21544.35])
+
     df = pd.DataFrame()
     for Rsheet in Rs:
         logging.info('Optimizing grids for Rsheet = %.3f' % Rsheet)
         df = df.append(simulate_H_and_iso({**params, 'Rsheet': Rsheet}),
                        ignore_index=True)
     results = results.append(df)
+
     # Create and save a visualization of the points just calculated
     vis_trend(df=df,
               xaxis='Rsheet', xlabel='sheet resistance [Ohm/sq.]',
@@ -103,7 +103,7 @@ def compare_H_vs_Iso(params):
     # EXPERIMENT: Sweep Metal Resistivity
     Ps = np.logspace(np.log10(10**-7.5), np.log10(10**-5.5), num=RESOLUTION,
                      endpoint=True, base=10)
-    # Ps = np.array([6.81E-08, 1.47E-07, 3.16E-07, 6.81E-07, 1.00E-06, 1.47E-06])
+
     df = pd.DataFrame()
     for Pwire in Ps:
         logging.info('Optimizing grids for Pwire = %.3f' % Pwire)
@@ -118,13 +118,14 @@ def compare_H_vs_Iso(params):
 
     # EXPERIMENT: Sweep R
     Rs = np.logspace(-1, np.log10(20), num=RESOLUTION, endpoint=True, base=10)
-    # Rs = np.array([0.242, 0.585, 1.414, 3.42, 5, 8.27])
+
     df = pd.DataFrame()    
     for R in Rs:
         logging.info('Optimizing grids for R = %.3f' % R)
         df = df.append(simulate_H_and_iso({**params, 'R': R}),
                        ignore_index=True)
     results = results.append(df)
+
     # Create and save a visualization of the points just calculated
     vis_trend(df=df,
               xaxis='R', xlabel='radius [cm]',
@@ -134,13 +135,14 @@ def compare_H_vs_Iso(params):
     # EXPERIMENT: Sweep Jsol
     Js = np.logspace(np.log10(.0002), np.log10(0.2), num=RESOLUTION,
                      endpoint=True, base=10)
-    # Js = np.array([0.000632, 0.002, 0.006325, 0.02, 0.063246])
+
     df = pd.DataFrame()
     for J in Js:
         logging.info('Optimizing grids for Jsol = %.3f' % J)
         df = df.append(simulate_H_and_iso({**params, 'Jsol': J}),
                        ignore_index=True)
     results = results.append(df)
+
     # Create and save a visualization of the points just calculated
     vis_trend(df=df,
               xaxis='Jsol', xlabel='solar current [A/cm2]',
@@ -167,8 +169,10 @@ def wobble_about_optimal(params):
                                   'pitch': b},
                                  ignore_index=True)
 
-    # TODO skip this force
+    # Choose center point:
     # power, best_w, best_b = simulate_H(params)
+
+    # Optionally, override center point. (Match Griddler data points)
     best_w = 0.0213923763549842
     best_b = 0.17134455868565
     power, _, _ = simulate_H(params, force=(best_w, best_b))
@@ -187,7 +191,6 @@ def wobble_about_optimal(params):
         log_result(power, w, b)
 
     results.to_csv(output_csv, index=False)
-    
 
 
 if __name__ == '__main__':
