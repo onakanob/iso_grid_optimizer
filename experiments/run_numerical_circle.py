@@ -156,7 +156,7 @@ def wobble_about_optimal(params):
     """Get results adjacent to the optimum H-bar center point."""
     output_csv = os.path.join(params['log_dir'], 'wobble_about_optimal.csv')
     STEP = 0.85
-    steps = np.power(STEP, np.arange(-3, 4))
+    steps = np.power(STEP, np.arange(-4, 5))
     results = pd.DataFrame()
 
     def log_result(power, w, b):
