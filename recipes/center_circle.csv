@@ -1,9 +1,10 @@
 ﻿param,value
-Voc,0.8
+Voc,0.42
 Jsol,0.02
 Pwire,1.00E-06
-Rsheet,1000
+Rsheet,15
 w_min,1.00E-04
 b_min,1.00E-01
 h,5.00E-04
 R,5.00E+00
+epsilon,5.00E-02

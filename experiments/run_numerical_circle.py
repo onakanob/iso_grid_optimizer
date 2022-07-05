@@ -23,19 +23,31 @@ def simulate_H_and_iso(params):
     """Run H-bar and isometric circle patterns with the params provided.
     params - dictionary of simulation parameters
     results - pandas dataframe to which results should be appended"""
-    R = params['R']
-    power_H, w_H, b_H = simulate_H(params)
-    power_iso, w_iso, b_iso = simulate_iso(params)
-    return {**params,
-            'H-Bar W': power_H,
-            'H-Bar W/cm2': power_H / (np.pi * R**2),
-            'H-Bar width': w_H,
-            'H-Bar pitch': b_H,
-
-            'Isotropic W': power_iso,
-            'Isotropic W/cm2': power_iso / (np.pi * R**2),
-            'Isotropic width': w_iso,
-            'Isotropic pitch': b_iso}
+    try:
+        R = params['R']
+        power_H, w_H, b_H = simulate_H(params)
+        power_iso, w_iso, b_iso = simulate_iso(params)
+        return {**params,
+                'H-Bar W': power_H,
+                'H-Bar W/cm2': power_H / (np.pi * R**2),
+                'H-Bar width': w_H,
+                'H-Bar pitch': b_H,
+    
+                'Isotropic W': power_iso,
+                'Isotropic W/cm2': power_iso / (np.pi * R**2),
+                'Isotropic width': w_iso,
+                'Isotropic pitch': b_iso}
+    except:
+        return {**params,
+                'H-Bar W': None,
+                'H-Bar W/cm2': None,
+                'H-Bar width': None,
+                'H-Bar pitch': None,
+    
+                'Isotropic W': None,
+                'Isotropic W/cm2': None,
+                'Isotropic width': None,
+                'Isotropic pitch': None}
 
 
 def vis_trend(df, xaxis, xlabel, title, directory, logscale=False):
@@ -71,15 +83,16 @@ def compare_H_vs_Iso(params):
     logging.info('Center point: ' + str(df))
 
     # EXPERIMENT: Sweep Sheet Resistivity
-    # Rs = np.logspace(np.log10(10), np.log10(100000), num=RESOLUTION,
-    #                  endpoint=True, base=10)
-    Rs = np.array([46.42, 215.44, 1000, 4641.59, 21544.35])
+    Rs = np.logspace(np.log10(1), np.log10(10000), num=RESOLUTION,
+                     endpoint=True, base=10)
+
     df = pd.DataFrame()
     for Rsheet in Rs:
         logging.info('Optimizing grids for Rsheet = %.3f' % Rsheet)
         df = df.append(simulate_H_and_iso({**params, 'Rsheet': Rsheet}),
                        ignore_index=True)
     results = results.append(df)
+
     # Create and save a visualization of the points just calculated
     vis_trend(df=df,
               xaxis='Rsheet', xlabel='sheet resistance [Ohm/sq.]',
@@ -88,9 +101,9 @@ def compare_H_vs_Iso(params):
 
 
     # EXPERIMENT: Sweep Metal Resistivity
-    # Ps = np.logspace(np.log10(10**-7.5), np.log10(10**-5.5), num=RESOLUTION,
-    #                  endpoint=True, base=10)
-    Ps = np.array([6.81E-08, 1.47E-07, 3.16E-07, 6.81E-07, 1.00E-06, 1.47E-06])
+    Ps = np.logspace(np.log10(10**-7.5), np.log10(10**-5.5), num=RESOLUTION,
+                     endpoint=True, base=10)
+
     df = pd.DataFrame()
     for Pwire in Ps:
         logging.info('Optimizing grids for Pwire = %.3f' % Pwire)
@@ -104,14 +117,15 @@ def compare_H_vs_Iso(params):
               logscale=True)
 
     # EXPERIMENT: Sweep R
-    # Rs = np.logspace(-1, np.log10(20), num=RESOLUTION, endpoint=True, base=10)
-    Rs = np.array([0.242, 0.585, 1.414, 3.42, 5, 8.27])
+    Rs = np.logspace(-1, np.log10(20), num=RESOLUTION, endpoint=True, base=10)
+
     df = pd.DataFrame()    
     for R in Rs:
         logging.info('Optimizing grids for R = %.3f' % R)
         df = df.append(simulate_H_and_iso({**params, 'R': R}),
                        ignore_index=True)
     results = results.append(df)
+
     # Create and save a visualization of the points just calculated
     vis_trend(df=df,
               xaxis='R', xlabel='radius [cm]',
@@ -119,15 +133,16 @@ def compare_H_vs_Iso(params):
               logscale=False)
 
     # EXPERIMENT: Sweep Jsol
-    # Js = np.logspace(np.log10(.0002), np.log10(0.2), num=RESOLUTION,
-    #                  endpoint=True, base=10)
-    Js = np.array([0.000632, 0.002, 0.006325, 0.02, 0.063246])
+    Js = np.logspace(np.log10(.0002), np.log10(0.2), num=RESOLUTION,
+                     endpoint=True, base=10)
+
     df = pd.DataFrame()
     for J in Js:
         logging.info('Optimizing grids for Jsol = %.3f' % J)
         df = df.append(simulate_H_and_iso({**params, 'Jsol': J}),
                        ignore_index=True)
     results = results.append(df)
+
     # Create and save a visualization of the points just calculated
     vis_trend(df=df,
               xaxis='Jsol', xlabel='solar current [A/cm2]',
@@ -143,7 +158,7 @@ def wobble_about_optimal(params):
     """Get results adjacent to the optimum H-bar center point."""
     output_csv = os.path.join(params['log_dir'], 'wobble_about_optimal.csv')
     STEP = 0.85
-    steps = np.power(STEP, np.arange(-3, 4))
+    steps = np.power(STEP, np.arange(-4, 5))
     results = pd.DataFrame()
 
     def log_result(power, w, b):
@@ -154,7 +169,13 @@ def wobble_about_optimal(params):
                                   'pitch': b},
                                  ignore_index=True)
 
-    power, best_w, best_b = simulate_H(params)
+    # Choose center point:
+    # power, best_w, best_b = simulate_H(params)
+
+    # Optionally, override center point. (Match Griddler data points)
+    best_w = 0.0213923763549842
+    best_b = 0.17134455868565
+    power, _, _ = simulate_H(params, force=(best_w, best_b))
     log_result(power, best_w, best_b)
     logging.info('Center optimal (power, width, pitch): ' + str((power, best_w, best_b)))
 
@@ -170,7 +191,6 @@ def wobble_about_optimal(params):
         log_result(power, w, b)
 
     results.to_csv(output_csv, index=False)
-    
 
 
 if __name__ == '__main__':
