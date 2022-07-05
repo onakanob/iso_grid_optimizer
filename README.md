@@ -1,7 +1,9 @@
 # iso_grid_optimizer
-Geometry optimization loops for H-bar and isotropic solar cell front electrodes with central sink and circular envelope.
+Geometry optimization loops for H-bar and isotropic solar cell front electrodes with central sink and circular outer envelope.
 
-This repository contains code necessary to replicate experiments and figures presented in the paper "Isotropic Grids Revisited: A Numerical Study of Solar Cell Electrode Geometries" (pre-print).
+This repository contains companion code necessary to replicate experiments and figures presented in:
+Nakano-Baker, O., Boyd, C., Cramer, C., Brush, L. & MacKenzie, J. D. Isotropic Grids Revisited: A Numerical Study of Solar Cell Electrode Geometries. IEEE Trans. Electron Devices 69, 3783–3790 (2022). DOI: 10.1109/TED.2022.3174810
+
 
 # Usage
 ## Notebooks
@@ -27,17 +29,3 @@ simulate_iso(params, force=None)
     provided grid geometry.
 
     returns - Power [W], width[cm], pitch[cm]
-
-
-The parameters needed in the dictionary to run a simulation are:
-
-| parameter | description |
-| -- | -- |
-| R | cell radius [cm] |
-| Jsol | photocurrent density [A/cm2] |
-| Voc | operating voltage [V] |
-| Rsheet | device stack sheet resistance [Ohm/sq.] |
-| w_min | smallest allowed wire [cm] |
-| b_min | smallest allowed pitch [cm] |
-| Pwire | resistivity of the grid lines [Ohm-cm] |
-| h | grid line wire height [cm] |
